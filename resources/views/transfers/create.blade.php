@@ -19,7 +19,7 @@
     <p>
         Nominal Transfer
         <br>
-        <input type="number" name="amount">
+        Rp. <input type="number" name="amount">
     </p>
 
     <p>
