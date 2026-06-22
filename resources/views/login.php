@@ -21,11 +21,11 @@
                 <div class="brand-lockup">
                     <img src="<?php echo e($logoPath); ?>" alt="Logo Digital Banking" class="brand-photo">
                     <div>
-                        <p class="brand-kicker">Digital Banking UAS</p>
-                        <h1>Banking dashboard</h1>
+                        <p class="brand-kicker">Digital Banking</p>
+                        <h1>Digeboy</h1>
                     </div>
                 </div>
-                <p class="brand-copy">Masuk untuk membuka dashboard rekening, pembayaran, status, dan notifikasi.</p>
+                <p class="brand-copy">Masuk untuk menjadi bagian dari Digeboy</p>
             </section>
 
             <section class="form-container" aria-labelledby="login-title">
