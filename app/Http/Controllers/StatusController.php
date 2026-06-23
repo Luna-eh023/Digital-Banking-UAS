@@ -8,7 +8,7 @@ class StatusController extends Controller
 {
     public function index()
     {
-        $payments = Pay::all();
+        $payments = Pay::with('statuses')->latest()->get();
 
         return view('status', compact('payments'));
     }

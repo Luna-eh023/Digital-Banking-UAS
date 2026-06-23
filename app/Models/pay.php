@@ -1,18 +1,22 @@
 <?php
 
 namespace App\Models;
-//sementara gak tau pake database apa jadi mongodb dulu
-use MongoDB\Laravel\Eloquent\Model;
 
-class Payment extends Model
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Pay extends Model
 {
-    protected $connection = 'mongodb';
-
-    protected $collection = 'payments';
+    protected $table = 'payments';
 
     protected $fillable = [
         'user_id',
         'amount',
-        'status'
+        'status',
     ];
+
+    public function statuses(): HasMany
+    {
+        return $this->hasMany(Status::class, 'payment_id');
+    }
 }
