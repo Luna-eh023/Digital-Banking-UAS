@@ -21,6 +21,9 @@ class SecurityController extends Controller
             'security_answer' => $request->security_answer
         ]);
 
-        return back()->with('success', 'Data keamanan berhasil disimpan');
+        return back()->with(
+            'success',
+            'Data Security berhasil disimpan'
+        );
     }
 }

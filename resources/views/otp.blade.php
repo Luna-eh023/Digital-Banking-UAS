@@ -2,27 +2,51 @@
 <html>
 <head>
     <title>OTP</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
 
-<h1>Halaman OTP</h1>
+<div class="container mt-5">
 
-@if(session('success'))
-    <h3 style="color:green">
-        {{ session('success') }}
-    </h3>
-@endif
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h3>Generate OTP</h3>
+        </div>
 
-<form action="/otp" method="POST">
-    @csrf
+        <div class="card-body">
 
-    <label>Email:</label><br>
-    <input type="email" name="email" required><br><br>
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-    <button type="submit">
-        Generate OTP
-    </button>
-</form>
+            //mengirim email ke otp controller
+            <form action="/otp" method="POST">
+                @csrf
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        class="form-control"
+                        placeholder="Masukkan Email"
+                        required>
+                </div>
+
+                <button class="btn btn-primary">
+                    Generate OTP
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
 
 </body>
 </html>
