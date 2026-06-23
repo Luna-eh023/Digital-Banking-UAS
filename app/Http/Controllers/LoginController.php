@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Login;
 use App\Models\Notification;
-use App\Models\OTP;
 use App\Models\Setting;
+use App\Services\OtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +16,9 @@ class LoginController extends Controller
     public function show(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect()->route('dashboard');
+            return session('otp_verified')
+                ? redirect()->route('dashboard')
+                : redirect()->route('otp.index');
         }
 
         return view('login');
@@ -47,13 +49,7 @@ class LoginController extends Controller
                 Setting::where('user_id', Auth::id())->where('key', 'theme')->value('value') ?? 'light'
             );
 
-            $otp = (string) random_int(100000, 999999);
-
-            OTP::create([
-                'email' => Auth::user()->email,
-                'otp_code' => $otp,
-                'expired_at' => now()->addMinutes(5),
-            ]);
+            $otp = OtpService::generate(Auth::user()->email, 'login');
 
             Notification::create([
                 'user_id' => Auth::id(),

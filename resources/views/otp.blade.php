@@ -36,7 +36,10 @@
                 @endif
 
                 @if (session('demo_otp'))
-                    <div class="notice success">Kode OTP demo: <strong>{{ session('demo_otp') }}</strong></div>
+                    <div class="notice success">
+                        Kode OTP demo: <strong>{{ session('demo_otp') }}</strong>
+                        <br><small>OTP juga tercatat di <code>storage/logs/laravel.log</code>.</small>
+                    </div>
                 @elseif ($latestOtp)
                     <div class="notice info">Kode terakhir berlaku sampai {{ $latestOtp->expired_at->format('H:i') }}.</div>
                 @endif

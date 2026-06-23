@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Notification;
 use App\Models\OTP;
+use App\Services\OtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,11 +34,7 @@ class OTPController extends Controller
             'otp_code.digits' => 'Kode OTP harus 6 digit.',
         ]);
 
-        $otp = OTP::where('email', Auth::user()->email)
-            ->where('otp_code', $validated['otp_code'])
-            ->where('expired_at', '>=', now())
-            ->latest()
-            ->first();
+        $otp = OtpService::verify(Auth::user()->email, $validated['otp_code']);
 
         if (! $otp) {
             return back()->withErrors([
@@ -59,13 +56,7 @@ class OTPController extends Controller
 
     public function resend(): RedirectResponse
     {
-        $otp = (string) random_int(100000, 999999);
-
-        OTP::create([
-            'email' => Auth::user()->email,
-            'otp_code' => $otp,
-            'expired_at' => now()->addMinutes(5),
-        ]);
+        $otp = OtpService::generate(Auth::user()->email, 'resend');
 
         return back()
             ->with('status', 'Kode OTP baru sudah dibuat.')

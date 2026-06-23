@@ -419,6 +419,13 @@ h2 {
     text-align: right;
 }
 
+.transaction-amount small {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
 .transaction-amount strong {
     display: block;
     color: var(--navy);

@@ -427,6 +427,13 @@ body.theme-dark .security-summary a {
     text-align: right;
 }
 
+.transaction-amount small {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
 .status-pill,
 .badge {
     display: inline-flex;

@@ -10,7 +10,7 @@ class EnsureOtpIsVerified
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->session()->boolean('otp_verified')) {
+        if (! (bool) $request->session()->get('otp_verified', false)) {
             return redirect()->route('otp.index');
         }
 

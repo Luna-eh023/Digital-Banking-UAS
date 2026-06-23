@@ -46,7 +46,7 @@ Route::middleware('auth')->group(function (): void {
         Route::resource('balances', BalanceController::class);
         Route::get('/transfers/create', [TransferController::class, 'create'])->name('transfers.create');
         Route::post('/transfers', [TransferController::class, 'store'])->name('transfers.store');
-        Route::get('/transactions/history', [TransactionHistoryController::class, 'index'])->name('transactions.history');
+        Route::get('/transactions/history', [TransactionHistoryController::class, 'transferHistory'])->name('transactions.history');
 
         Route::resource('posts', PostController::class);
     });

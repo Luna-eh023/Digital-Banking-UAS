@@ -1,43 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <title>Transfer Dana</title>
 </head>
-<body>
 
-<h2>Transfer Dana</h2>
+<body class="page-body theme-{{ session('theme', 'light') }}">
+    <main class="standalone-page">
+        <header class="page-hero">
+            <div>
+                <p class="eyebrow">Transfer</p>
+                <h1>Transfer dana</h1>
+                <p>Kirim dana ke penerima dengan tampilan fresh navy & putih yang konsisten dengan dashboard.</p>
+            </div>
+            <div class="topbar-actions">
+                <a href="{{ route('dashboard') }}" class="ghost-button light">Dashboard</a>
+                <a href="{{ route('transactions.index') }}" class="ghost-button light">History</a>
+            </div>
+        </header>
 
-<form action="{{ route('transfers.store') }}" method="POST">
-    @csrf
+        @if (session('success'))
+            <div class="notice success">{{ session('success') }}</div>
+        @endif
 
-    <p>
-        Nama Penerima
-        <br>
-        <input type="text" name="receiver">
-    </p>
+        <section class="form-grid">
+            <form class="panel form-panel" action="{{ route('transfers.store') }}" method="POST">
+                @csrf
 
-    <p>
-        Nominal Transfer
-        <br>
-        Rp. <input type="number" name="amount">
-    </p>
+                <div>
+                    <p class="eyebrow">Form transfer</p>
+                    <h2>Detail penerima</h2>
+                </div>
 
-    <p>
-        Keterangan
-        <br>
-        <textarea name="description"></textarea>
-    </p>
+                <label for="receiver">
+                    Nama penerima
+                    <input id="receiver" type="text" name="receiver" value="{{ old('receiver') }}" placeholder="Contoh: Raka Pratama" required>
+                </label>
+                @error('receiver')
+                    <p class="input-error">{{ $message }}</p>
+                @enderror
 
-    <button type="submit">
-        Transfer
-    </button>
-</form>
+                <label for="amount">
+                    Nominal transfer
+                    <input id="amount" type="number" name="amount" min="1000" step="1000" value="{{ old('amount') }}" placeholder="Contoh: 50000" required>
+                </label>
+                @error('amount')
+                    <p class="input-error">{{ $message }}</p>
+                @enderror
 
-<br>
+                <label for="description">
+                    Keterangan
+                    <textarea id="description" name="description" placeholder="Contoh: pembayaran tagihan">{{ old('description') }}</textarea>
+                </label>
+                @error('description')
+                    <p class="input-error">{{ $message }}</p>
+                @enderror
 
-<a href="{{ route('transactions.history') }}">
-    Lihat Riwayat Transaksi
-</a>
+                <button class="primary-action" type="submit">Proses transfer</button>
+            </form>
 
+            <aside class="panel help-panel">
+                <p class="eyebrow">Alternatif</p>
+                <h2>Payment cepat</h2>
+                <p>Gunakan menu Payment jika ingin transfer langsung dari saldo akun dengan notifikasi otomatis.</p>
+                <a href="{{ route('payment.index') }}" class="ghost-button">Buka payment</a>
+
+                <div class="security-summary">
+                    <span>Status</span>
+                    <strong>Siap transfer</strong>
+                    <a href="{{ route('status.index') }}">Lihat status transaksi</a>
+                </div>
+            </aside>
+        </section>
+    </main>
 </body>
+
 </html>

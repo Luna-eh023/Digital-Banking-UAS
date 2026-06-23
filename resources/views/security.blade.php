@@ -28,7 +28,10 @@
         @endif
 
         @if (session('demo_otp'))
-            <div class="notice info">Kode OTP demo: <strong>{{ session('demo_otp') }}</strong></div>
+            <div class="notice success">
+                Kode OTP demo: <strong>{{ session('demo_otp') }}</strong>
+                <br><small>OTP juga dicatat di terminal/log Laravel (<code>storage/logs/laravel.log</code>).</small>
+            </div>
         @endif
 
         <section class="security-grid">

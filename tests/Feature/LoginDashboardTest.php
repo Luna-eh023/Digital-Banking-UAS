@@ -10,7 +10,12 @@ class LoginDashboardTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_login_redirects_to_dashboard_even_when_intended_url_exists(): void
+    private function verifiedSession(): array
+    {
+        return ['otp_verified' => true];
+    }
+
+    public function test_login_redirects_to_otp_after_successful_authentication(): void
     {
         $user = User::updateOrCreate(
             ['email' => 'login-dashboard@example.com'],
@@ -28,11 +33,11 @@ class LoginDashboardTest extends TestCase
                 'password' => 'password',
             ]);
 
-        $response->assertRedirect(route('dashboard'));
+        $response->assertRedirect(route('otp.index'));
         $this->assertAuthenticatedAs($user);
     }
 
-    public function test_authenticated_user_opening_login_is_redirected_to_dashboard(): void
+    public function test_authenticated_user_opening_login_is_redirected_to_otp_when_not_verified(): void
     {
         $user = User::updateOrCreate(
             ['email' => 'already-login-dashboard@example.com'],
@@ -45,10 +50,10 @@ class LoginDashboardTest extends TestCase
 
         $this->actingAs($user)
             ->get('/login')
-            ->assertRedirect(route('dashboard'));
+            ->assertRedirect(route('otp.index'));
     }
 
-    public function test_authenticated_user_can_view_dashboard(): void
+    public function test_authenticated_user_can_view_dashboard_after_otp_verified(): void
     {
         $user = User::updateOrCreate(
             ['email' => 'view-dashboard@example.com'],
@@ -60,6 +65,7 @@ class LoginDashboardTest extends TestCase
         );
 
         $this->actingAs($user)
+            ->withSession($this->verifiedSession())
             ->get('/dashboard')
             ->assertOk()
             ->assertSee('Digital Banking')
@@ -77,14 +83,16 @@ class LoginDashboardTest extends TestCase
             ]
         );
 
-        $this->actingAs($user)->get('/payment')->assertOk()->assertSee('Buat transfer baru');
-        $this->actingAs($user)->get('/status')->assertOk()->assertSee('Status pembayaran');
-        $this->actingAs($user)->get('/transactions')->assertOk()->assertSee('Transaction history');
+        $session = $this->verifiedSession();
+
+        $this->actingAs($user)->withSession($session)->get('/payment')->assertOk()->assertSee('Buat transfer baru');
+        $this->actingAs($user)->withSession($session)->get('/status')->assertOk()->assertSee('Status pembayaran');
+        $this->actingAs($user)->withSession($session)->get('/transactions')->assertOk()->assertSee('Transaction history');
         $this->actingAs($user)->get('/security')->assertOk()->assertSee('Security center');
-        $this->actingAs($user)->get('/notifications')->assertOk()->assertSee('Daftar notifikasi');
+        $this->actingAs($user)->withSession($session)->get('/notifications')->assertOk()->assertSee('Daftar notifikasi');
     }
 
-    public function test_authenticated_user_can_create_pending_transfer(): void
+    public function test_authenticated_user_can_create_payment(): void
     {
         $user = User::updateOrCreate(
             ['email' => 'transfer-dashboard@example.com'],
@@ -96,13 +104,18 @@ class LoginDashboardTest extends TestCase
         );
 
         $this->actingAs($user)
-            ->post('/payment', ['amount' => 250000])
+            ->withSession($this->verifiedSession())
+            ->post('/payment', [
+                'receiver' => 'Raka Pratama',
+                'amount' => 250000,
+                'description' => 'Test payment',
+            ])
             ->assertRedirect(route('status.index'));
 
         $this->assertDatabaseHas('payments', [
             'user_id' => $user->id,
             'amount' => 250000,
-            'status' => 'Pending',
+            'status' => 'Success',
         ]);
     }
 
@@ -120,8 +133,27 @@ class LoginDashboardTest extends TestCase
         $this->post('/login', [
             'no_card' => 'jhodya@jhodya',
             'password' => '133345',
-        ])->assertRedirect(route('dashboard'));
+        ])->assertRedirect(route('otp.index'));
 
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_forgot_password_can_generate_demo_otp(): void
+    {
+        $user = User::updateOrCreate(
+            ['email' => 'forgot-password@example.com'],
+            [
+                'name' => 'Forgot Password',
+                'no_card' => '888000111',
+                'password' => 'password',
+            ]
+        );
+
+        $this->post('/security', [
+            'intent' => 'send_otp',
+            'account' => $user->email,
+        ])
+            ->assertRedirect(route('security.index'))
+            ->assertSessionHas('demo_otp');
     }
 }

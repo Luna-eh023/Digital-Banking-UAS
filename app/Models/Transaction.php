@@ -9,7 +9,11 @@ class Transaction extends Model
     protected $fillable = [
         'transfer_id',
         'status',
-        'transaction_date'
+        'transaction_date',
+    ];
+
+    protected $casts = [
+        'transaction_date' => 'datetime',
     ];
 
     public function transfer()

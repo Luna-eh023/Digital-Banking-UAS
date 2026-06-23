@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\OTP;
 use App\Models\Security;
 use App\Models\User;
+use App\Services\OtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,18 +34,15 @@ class SecurityController extends Controller
             $user = $this->findUser($validated['account']);
 
             if (! $user) {
-                return back()->withErrors(['account' => 'Akun tidak ditemukan.']);
+                return redirect()
+                    ->route('security.index')
+                    ->withErrors(['account' => 'Akun tidak ditemukan.']);
             }
 
-            $otp = (string) random_int(100000, 999999);
+            $otp = OtpService::generate($user->email, 'reset-password');
 
-            OTP::create([
-                'email' => $user->email,
-                'otp_code' => $otp,
-                'expired_at' => now()->addMinutes(5),
-            ]);
-
-            return back()
+            return redirect()
+                ->route('security.index')
                 ->with('success', 'Kode OTP reset password berhasil dibuat.')
                 ->with('demo_otp', $otp)
                 ->withInput(['account' => $validated['account']]);
@@ -60,17 +58,17 @@ class SecurityController extends Controller
             $user = $this->findUser($validated['account']);
 
             if (! $user) {
-                return back()->withErrors(['account' => 'Akun tidak ditemukan.'])->withInput();
+                return redirect()
+                    ->route('security.index')
+                    ->withErrors(['account' => 'Akun tidak ditemukan.'])
+                    ->withInput();
             }
 
-            $otp = OTP::where('email', $user->email)
-                ->where('otp_code', $validated['otp_code'])
-                ->where('expired_at', '>=', now())
-                ->latest()
-                ->first();
+            $otp = OtpService::verify($user->email, $validated['otp_code']);
 
             if (! $otp) {
-                return back()
+                return redirect()
+                    ->route('security.index')
                     ->withErrors(['otp_code' => 'Kode OTP salah atau sudah kedaluwarsa.'])
                     ->withInput();
             }
@@ -93,7 +91,9 @@ class SecurityController extends Controller
 
         Security::create($validated);
 
-        return back()->with('success', 'Data security berhasil disimpan.');
+        return redirect()
+            ->route('security.index')
+            ->with('success', 'Data security berhasil disimpan.');
     }
 
     private function findUser(string $account): ?User
