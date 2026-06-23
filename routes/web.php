@@ -2,18 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\PayController;
-use App\Http\Controllers\StatusController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TransferController;
+use App\Http\Controllers\TransactionController;
 
 Route::get('/', function () {
-    return redirect('/posts');
+    return view('welcome');
 });
 
 Route::resource('posts', PostController::class);
-Route::get('/payment', [PayController::class, 'index']);
-Route::post('/payment', [PayController::class, 'store']);
-Route::get('/status', [StatusController::class, 'index']);
-Route::get('/notifications', [NotificationController::class, 'index']);
-Route::get('/settings', [SettingController::class, 'index']);
+
+Route::resource('transfers', TransferController::class);
+
+Route::get('/transactions/history',
+    [TransactionController::class, 'history']
+)->name('transactions.history');
