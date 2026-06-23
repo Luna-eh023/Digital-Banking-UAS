@@ -1,9 +1,10 @@
 <?php
 
-namespace app\Http\Controllers;
+namespace App\Http\Controllers;
 
+use App\Models\Pay;
 use Illuminate\Http\Request;
-use App\Models\pay;
+use Illuminate\Support\Facades\Auth;
 
 class PayController extends Controller
 {
@@ -11,14 +12,23 @@ class PayController extends Controller
     {
         return view('payment');
     }
-     public function store(Request $request)
+
+    public function store(Request $request)
     {
-        Pay::create([
-            'user_id' => $request->user_id,
-            'amount' => $request->amount,
-            'status' => 'Pending'
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:1000',
         ]);
 
-        return redirect('/status');
+        $payment = Pay::create([
+            'user_id' => Auth::id(),
+            'amount' => $validated['amount'],
+            'status' => 'Pending',
+        ]);
+
+        $payment->statuses()->create([
+            'status' => 'Pending',
+        ]);
+
+        return redirect()->route('status.index')->with('success', 'Payment berhasil dibuat.');
     }
 }

@@ -19,18 +19,8 @@ Route::get('/', function () {
 });
 
 Route::resource('posts', PostController::class);
-
-Route::get('/payment', [PayController::class, 'index']);
-Route::post('/payment', [PayController::class, 'store']);
-
-Route::get('/status', [StatusController::class, 'index']);
-
+Route::get('/payment', [PayController::class, 'index'])->name('payment.index');
+Route::post('/payment', [PayController::class, 'store'])->name('payment.store');
+Route::get('/status', [StatusController::class, 'index'])->name('status.index');
 Route::get('/notifications', [NotificationController::class, 'index']);
-
-
-// TAMBAHKAN INI
-Route::get('/otp', [OTPController::class, 'index']);
-Route::post('/otp', [OTPController::class, 'store']);
-
-Route::get('/security', [SecurityController::class, 'index']);
-Route::post('/security', [SecurityController::class, 'store']);
+Route::get('/settings', [SettingController::class, 'index']);
